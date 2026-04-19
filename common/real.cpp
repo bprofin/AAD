@@ -11,6 +11,9 @@ namespace aad {
         return tape->grads[idx];
     }
 
+    //////////////////////////////////
+    ///OP Real Real //////////////////
+    //////////////////////////////////
     Real Real::operator+(const Real &rhs) const {
         double v = val() + rhs.val();
         size_t out = tape->new_var(v);
@@ -36,6 +39,38 @@ namespace aad {
         double v = val() / rhs.val();
         size_t out = tape->new_var(v);
         tape->record(OP_DIV, out, idx, rhs.idx);
+        return {out, tape};
+    }
+
+    //////////////////////////////////
+    /// OP Real double //////////////
+    //////////////////////////////////
+    Real Real::operator+(double rhs) const {
+        double v = val() + rhs;
+        size_t out = tape->new_var(v);
+        // store constant in 'b' so backward pass knows it
+        tape->record(OP_ADD_LEFT, out, idx, tape->new_var(rhs));
+        return {out, tape};
+    }
+
+    Real Real::operator-(double rhs) const {
+        double v = val() - rhs;
+        size_t out = tape->new_var(v);
+        tape->record(OP_SUB_LEFT, out, idx, tape->new_var(rhs));
+        return {out, tape};
+    }
+
+    Real Real::operator*(double rhs) const {
+        double v = val() * rhs;
+        size_t out = tape->new_var(v);
+        tape->record(OP_MUL_LEFT, out, idx, tape->new_var(rhs)); // store rhs
+        return {out, tape};
+    }
+
+    Real Real::operator/(double rhs) const {
+        double v = val() / rhs;
+        size_t out = tape->new_var(v);
+        tape->record(OP_DIV_LEFT, out, idx, tape->new_var(rhs)); // store rhs
         return {out, tape};
     }
 

@@ -1,7 +1,8 @@
 file(GLOB TEST_FILES
         #"${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
         #"${CMAKE_CURRENT_SOURCE_DIR}/*.cxx"
-        ${CMAKE_CURRENT_SOURCE_DIR}/simple_example.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/example_simple.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/example_interpolator.cpp
 )
 
 # Create a separate executable target for each test file

@@ -5,7 +5,7 @@
 #include "common/op.h"
 
 namespace aad {
-    struct Tape {
+    AAD_VISIBILITY struct Tape {
         std::vector<double> vals;
         std::vector<double> grads;
         std::vector<Op> ops;
@@ -33,6 +33,9 @@ namespace aad {
                 const Op &op = ops[i];
 
                 switch (op.type) {
+                    ////////////////////////////
+                    ///Op Real Real//////////////
+                    /////////////////////////////
                     case OP_ADD:
                         grads[op.a] += grads[op.out];
                         grads[op.b] += grads[op.out];
@@ -53,6 +56,45 @@ namespace aad {
                         grads[op.b] -= grads[op.out] * vals[op.a] / (vals[op.b] * vals[op.b]);
                         break;
 
+                        ////////////////////////////
+                    /// Op Real constant //////
+                    ////////////////////////////
+                    case OP_ADD_LEFT:  // x + alpha
+                        grads[op.a] += grads[op.out];
+                        break;
+
+                    case OP_SUB_LEFT:  // x - alpha
+                        grads[op.a] += grads[op.out];
+                        break;
+
+                    case OP_MUL_LEFT:  // x * alpha
+                        grads[op.a] += grads[op.out] * vals[op.b]; // use the scalar value
+                        break;
+
+                    case OP_DIV_LEFT:  // x / alpha
+                        grads[op.a] += grads[op.out] / vals[op.b]; // scalar in denominator
+                        break;
+
+                        ////////////////////////////
+                    /// Op constant Real //////
+                    ////////////////////////////
+                    case OP_ADD_RIGHT:  // alpha + x
+                        grads[op.b] += grads[op.out];
+                        break;
+
+                    case OP_SUB_RIGHT:  // alpha - x
+                        grads[op.b] -= grads[op.out];
+                        break;
+
+                    case OP_MUL_RIGHT:  // alpha * x
+                        grads[op.b] += grads[op.out] * vals[op.a]; // use scalar value
+                        break;
+
+                    case OP_DIV_RIGHT:  // alpha / x
+                        grads[op.b] -= grads[op.out] * vals[op.a] / (vals[op.b] * vals[op.b]);
+                        break;
+
+                    // Unary opreations
                     case OP_EXP:
                         grads[op.a] += grads[op.out] * vals[op.out];
                         break;
